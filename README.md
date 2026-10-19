@@ -1,42 +1,44 @@
-# Personal PWA
+# 個人用PWA
 
-A personal, mobile-first PWA for keeping location-based notes. Notes are stored in
-the browser's IndexedDB and remain available on the device without a backend.
+位置情報付きのメモを保存する、モバイル向けの個人用PWAです。メモはブラウザーの
+IndexedDBに保存されるため、バックエンドなしで端末上から利用できます。
 
-## Development
+## 開発
 
 ```sh
 npm install
 npm run dev
 ```
 
-To enable Google Maps, create `.env.local` and set a restricted Maps JavaScript
-API key:
+Google マップを利用するには、アプリの**設定**を開き、ご自身で用意した利用制限付きの
+Maps JavaScript APIキーを入力してください。キーは、そのブラウザーおよびオリジンの
+IndexedDBに保存されます。GitHub Pagesのビルドには含まれず、ほかの端末にも同期されません。
 
-```sh
-VITE_GOOGLE_MAPS_API_KEY=your_api_key
-```
+APIキーがなくても、地図画面で保存済みメモの確認、座標の手動入力、現在地の取得を
+利用できます。位置情報の取得にはHTTPS（またはlocalhost）での接続と、ユーザーによる
+許可が必要です。
 
-Without a key, the map screen remains usable for saved notes, manual coordinates,
-and current-location capture. Geolocation requires HTTPS (or localhost) and user
-permission.
-
-## Production
+## 本番環境での実行
 
 ```sh
 npm run build
 npm run preview
 ```
 
-Serve the built app over HTTPS to install it on iPhone. In Safari, use **Share →
-Add to Home Screen**. The service worker caches the app shell; Google Maps and
-other external services still require a network connection.
+ビルドしたアプリをHTTPSで配信すると、iPhoneにインストールできます。Safariで
+**共有 → ホーム画面に追加**を選択してください。Service Workerはアプリの基本部分を
+キャッシュしますが、Google マップなどの外部サービスを利用するにはネットワーク接続が必要です。
 
-## GitHub Pages deployment
+## GitHub Pagesへのデプロイ
 
-Pushing to `main` builds the app and deploys it to GitHub Pages. The workflow
-enables Pages with the GitHub Actions source if it is not already enabled, and
-builds with the repository's Pages base path so assets, routes, and the PWA
-work from the project site URL. The workflow needs `pages: write` and
-`id-token: write` permissions; the account must be allowed to enable Pages for
-the repository.
+`main`ブランチにプッシュすると、アプリがビルドされ、GitHub Pagesにデプロイされます。
+Pagesがまだ有効でない場合、ワークフローがGitHub Actionsを公開元として有効にします。
+また、リポジトリのPages用ベースパスを指定してビルドするため、プロジェクトサイトのURLで
+アセット、ルート、PWAが正しく動作します。ワークフローには`pages: write`と
+`id-token: write`の権限が必要です。また、アカウントにリポジトリのPagesを有効化する
+権限が必要です。
+
+訪問者はそれぞれ、アプリの**設定**で自身のMaps APIキーを登録してください。Google Cloud
+コンソールで、キーの利用先をPagesのサイトURLに、利用APIをMaps JavaScript APIに制限して
+ください。ブラウザーに保存されたAPIキーは、同じブラウザープロファイルを使う人や、
+サイト上で実行されるスクリプトから参照できるため、秘密情報として扱うことはできません。

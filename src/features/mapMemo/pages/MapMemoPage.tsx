@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft, Crosshair, MapPin, Plus } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { EmptyState } from '../../../components/common/EmptyState'
@@ -7,7 +7,7 @@ import { MemoCard } from '../components/MemoCard'
 import { MemoForm } from '../components/MemoForm'
 import { useMapMemos } from '../hooks/useMapMemos'
 import { mapMemoRepository } from '../repository/mapMemoRepository'
-import { isGoogleMapsConfigured } from '../../../lib/googleMaps/loadGoogleMaps'
+import { googleMapsSettingsRepository } from '../../../lib/googleMaps/googleMapsSettingsRepository'
 import type { MapMemoInput } from '../types/mapMemo'
 
 type Position = { latitude: number; longitude: number }
@@ -21,6 +21,18 @@ export function MapMemoPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [locationError, setLocationError] = useState<string | null>(null)
   const [locating, setLocating] = useState(false)
+  const [googleMapsConfigured, setGoogleMapsConfigured] = useState(false)
+  const [googleMapsSettingsError, setGoogleMapsSettingsError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+    void googleMapsSettingsRepository.getApiKey().then((apiKey) => {
+      if (active) setGoogleMapsConfigured(Boolean(apiKey))
+    }).catch((cause: unknown) => {
+      if (active) setGoogleMapsSettingsError(cause instanceof Error ? cause.message : 'Google Mapsの設定を読み込めませんでした。')
+    })
+    return () => { active = false }
+  }, [])
 
   const openFormAt = useCallback((position: Position) => {
     setFormPosition(position)
@@ -90,10 +102,11 @@ export function MapMemoPage() {
         <MapView memos={memos} center={center} onChoosePosition={openFormAt} onSelectMemo={selectMemo} />
         <div className="map-hint">
           <MapPin size={14} />
-          {isGoogleMapsConfigured() ? '地図をタップして場所を選択' : 'APIキー設定後に地図上から場所を選べます'}
+          {googleMapsConfigured ? '地図をタップして場所を選択' : '設定画面でAPIキーを登録すると地図を利用できます'}
         </div>
       </section>
       {locationError && <p className="inline-error" role="alert">{locationError}</p>}
+      {googleMapsSettingsError && <p className="inline-error" role="alert">{googleMapsSettingsError}</p>}
 
       <section className="section-block map-memo-section">
         <div className="section-heading">

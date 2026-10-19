@@ -1,15 +1,20 @@
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 let mapsPromise: Promise<void> | undefined
+let mapsApiKey: string | undefined
 
-export function isGoogleMapsConfigured(): boolean {
-  return Boolean(apiKey)
-}
-
-export function loadGoogleMaps(): Promise<void> {
+export function loadGoogleMaps(apiKey: string): Promise<void> {
+  if (window.google?.maps) {
+    return mapsApiKey === apiKey
+      ? Promise.resolve()
+      : Promise.reject(new Error('APIキーを変更した場合は、ページを再読み込みして地図を再表示してください。'))
+  }
+  if (mapsPromise) {
+    return mapsApiKey === apiKey
+      ? mapsPromise
+      : Promise.reject(new Error('APIキーを変更した場合は、ページを再読み込みして地図を再表示してください。'))
+  }
   if (!apiKey) return Promise.reject(new Error('Google Maps APIキーが設定されていません。'))
-  if (window.google?.maps) return Promise.resolve()
-  if (mapsPromise) return mapsPromise
 
+  mapsApiKey = apiKey
   mapsPromise = new Promise((resolve, reject) => {
     const script = document.createElement('script')
     const callbackName = '__personalPwaGoogleMapsReady'
@@ -26,6 +31,7 @@ export function loadGoogleMaps(): Promise<void> {
     script.onerror = () => {
       delete window.__personalPwaGoogleMapsReady
       mapsPromise = undefined
+      mapsApiKey = undefined
       reject(new Error('地図を読み込めませんでした。ネットワークとAPIキーの設定を確認してください。'))
     }
     document.head.append(script)

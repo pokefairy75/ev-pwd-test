@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { WifiOff } from 'lucide-react'
-import { isGoogleMapsConfigured, loadGoogleMaps } from '../../../lib/googleMaps/loadGoogleMaps'
+import { loadGoogleMaps } from '../../../lib/googleMaps/loadGoogleMaps'
+import { googleMapsSettingsRepository } from '../../../lib/googleMaps/googleMapsSettingsRepository'
 import type { MapMemo } from '../types/mapMemo'
 
 type Position = { latitude: number; longitude: number }
@@ -17,13 +18,17 @@ export function MapView({ memos, center, onSelectMemo, onChoosePosition }: MapVi
   const markersRef = useRef<google.maps.Marker[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
   const [mapReady, setMapReady] = useState(false)
+  const [googleMapsConfigured, setGoogleMapsConfigured] = useState(false)
 
   useEffect(() => {
-    if (!isGoogleMapsConfigured() || !hostRef.current) return
     let active = true
     const handleAuthError = () => setLoadError('Google Maps APIキーを認証できませんでした。キーの制限と有効化設定を確認してください。')
     window.addEventListener('personal-pwa-maps-auth-error', handleAuthError)
-    void loadGoogleMaps().then(() => {
+    void googleMapsSettingsRepository.getApiKey().then(async (apiKey) => {
+      if (!active) return
+      setGoogleMapsConfigured(Boolean(apiKey))
+      if (!apiKey || !hostRef.current) return
+      await loadGoogleMaps(apiKey)
       if (!active || !hostRef.current || mapRef.current) return
       const map = new google.maps.Map(hostRef.current, {
         center: { lat: center.latitude, lng: center.longitude },
@@ -75,7 +80,7 @@ export function MapView({ memos, center, onSelectMemo, onChoosePosition }: MapVi
     })
   }, [mapReady, memos, onSelectMemo])
 
-  if (!isGoogleMapsConfigured() || loadError) {
+  if (!googleMapsConfigured || loadError) {
     return (
       <div className="map-unavailable">
         <div className="map-pattern" aria-hidden="true">

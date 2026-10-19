@@ -203,6 +203,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .status-pill.status-ready { background: #eaf1e8; color: #66826a; }
 .status-ready i { background: #78a17c; }
 .settings-error { margin-bottom: 10px; }
+.settings-api-form { padding: 0 0 12px; }
+.settings-api-form .field { display: grid; gap: 6px; color: #758178; font-size: 10px; font-weight: 650; }
+.settings-api-form .field input { width: 100%; height: 42px; padding: 0 11px; border: 1px solid #e1e5db; border-radius: 9px; background: #fffefa; color: var(--ink); font-size: 12px; }
+.settings-api-actions { display: flex; gap: 8px; margin-top: 10px; }
+.settings-api-actions .button { min-height: 38px; }
+.settings-message, .settings-security-note { margin: 0 0 11px; color: #77857a; font-size: 10px; line-height: 1.7; }
+.settings-security-note { color: #939b91; }
 .settings-links { padding-top: 0; padding-bottom: 0; }
 .settings-link-row:hover .settings-copy strong { color: #53735a; }
 .row-arrow { margin-left: auto; color: #a5afa2; }
