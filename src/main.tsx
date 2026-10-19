@@ -13,7 +13,9 @@ createRoot(rootElement).render(
 )
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  void navigator.serviceWorker.register('/sw.js').catch((cause: unknown) => {
+  void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, {
+    scope: import.meta.env.BASE_URL,
+  }).catch((cause: unknown) => {
     console.error('Service Workerを登録できませんでした。', cause)
   })
 }

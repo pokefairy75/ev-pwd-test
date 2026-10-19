@@ -31,3 +31,12 @@ npm run preview
 Serve the built app over HTTPS to install it on iPhone. In Safari, use **Share →
 Add to Home Screen**. The service worker caches the app shell; Google Maps and
 other external services still require a network connection.
+
+## GitHub Pages deployment
+
+Pushing to `main` builds the app and deploys it to GitHub Pages. The workflow
+enables Pages with the GitHub Actions source if it is not already enabled, and
+builds with the repository's Pages base path so assets, routes, and the PWA
+work from the project site URL. The workflow needs `pages: write` and
+`id-token: write` permissions; the account must be allowed to enable Pages for
+the repository.

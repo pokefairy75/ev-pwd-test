@@ -1,5 +1,6 @@
-const CACHE_NAME = 'personal-pwa-v1'
-const APP_SHELL = ['/', '/manifest.webmanifest', '/icon.svg']
+const CACHE_NAME = 'personal-pwa-v2'
+const APP_BASE = self.registration.scope
+const APP_SHELL = ['', 'manifest.webmanifest', 'icon.svg'].map((path) => new URL(path, APP_BASE).href)
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)))
@@ -30,7 +31,7 @@ self.addEventListener('fetch', (event) => {
         return response
       }).catch(async () => {
         if (request.mode === 'navigate') {
-          const shell = await caches.match('/')
+          const shell = await caches.match(new URL('', APP_BASE).href)
           if (shell) return shell
         }
         throw new Error(`Offline and no cached response for ${request.url}`)
